@@ -43,46 +43,44 @@ def loop():
     camera.capture(rawCapture, format="rgb",use_video_port=True)
     pi_image = rawCapture.array
     ids = scan_qr.scan(pi_image)
-    if ids is not None:
-        timer=time.perf_counter()
-        print(ids)
-        #cap = cv2.VideoCapture(0)
+    timer=time.perf_counter()
+    print(ids)
+    #cap = cv2.VideoCapture(0)
+    identified=False
+    ret, frame = cap.read()
+    frame = cv2.resize(frame, None, fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA)
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    frame_width = frame.shape[1]
+    #tv_post.value = ids
+    for (x,y,w,h) in faces:
+        forehead = (int(x+w/2),int(y+h*.15))
+        frame = cv2.rectangle(frame,forehead,(forehead[0]+1,forehead[1]+1),(255,0,0),2)
+        #frame = cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,0),2)
+        frame = cv2.rectangle(frame,((int(frame_width/2)-10),0),(int(frame_width/2+10),frame_width),(255,0,0),2)
+        if abs(forehead[0]-frame_width/2)<20 and ids is not None:
+            try:
+                names = face.detect(frame,faces)
+                tv_name.value = employees[names[0]]['name']
+                tv_post.value = employees[names[0]]['post']
+                if names[0]!='Unknown':
+                    identified=True
+            except:
+                pass
+        #frame = cv2.putText(frame,employees[names[0]]['name'],(x,y),cv2.FONT_HERSHEY_SIMPLEX,1,(255, 0, 0),2, cv2.LINE_AA)
+        #roi_gray = gray[y:y+h, x:x+w]
+        #roi_color = frame[y:y+h, x:x+w]
+   
+    frame = cv2.flip(frame, +1)
+    frame = Image.fromarray(frame)
+    pic.value=frame
+    '''if (time.perf_counter()-timer)>10 or identified:
+        cap.release()
         identified=False
-        while True:
-            ret, frame = cap.read()
-            frame = cv2.resize(frame, None, fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA)
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            faces = face_cascade.detectMultiScale(gray, 1.3, 5)
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            frame_width = frame.shape[1]
-            #tv_post.value = ids
-            for (x,y,w,h) in faces:
-                forehead = (int(x+w/2),int(y+h*.15))
-                frame = cv2.rectangle(frame,forehead,(forehead[0]+1,forehead[1]+1),(255,0,0),2)
-                #frame = cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,0),2)
-                frame = cv2.rectangle(frame,((int(frame_width/2)-10),0),(int(frame_width/2+10),frame_width),(255,0,0),2)
-                if abs(forehead[0]-frame_width/2)<20:
-                    try:
-                        names = face.detect(frame,faces)
-                        tv_name.value = employees[names[0]]['name']
-                        tv_post.value = employees[names[0]]['post']
-                        if names[0]!='Unknown':
-                            identified=True
-                    except:
-                        pass
-                #frame = cv2.putText(frame,employees[names[0]]['name'],(x,y),cv2.FONT_HERSHEY_SIMPLEX,1,(255, 0, 0),2, cv2.LINE_AA)
-                #roi_gray = gray[y:y+h, x:x+w]
-                #roi_color = frame[y:y+h, x:x+w]
-           
-            frame = cv2.flip(frame, +1)
-            frame = Image.fromarray(frame)
-            pic.value=frame
-            if (time.perf_counter()-timer)>10 or identified:
-                cap.release()
-                identified=False
-                cap = cv2.VideoCapture(0)
-                break
-            app.update()
+        cap = cv2.VideoCapture(0)
+        break
+    app.update()'''
             
     pi_image = cv2.flip(pi_image, +1)
     pi_image = Image.fromarray(pi_image)

@@ -1,24 +1,25 @@
 import face_recognition
-import cv2
+#import cv2
 import pickle
 import time
 from datetime import datetime
+
 data = pickle.loads(open('encodings.pickle', "rb").read())
-face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-cap = cv2.VideoCapture(0)
-time.sleep(3)
-while True:
+#face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+#cap = cv2.VideoCapture(0)
+#time.sleep(3)
+def detect(frame,faces):
     a=datetime.now()
-    ret, frame = cap.read()
+    #ret, frame = cap.read()
     #frame = cv2.resize(frame, None, fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA)
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    faces = face_cascade.detectMultiScale(gray, 1.3, 5)
-    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    #faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+    #rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     #boxes = face_recognition.face_locations(rgb,model='hog')
     # compute the facial embedding for the face
     boxes = [(y, x + w, y + h, x) for (x, y, w, h) in faces]
 
-    encodings = face_recognition.face_encodings(rgb, boxes)
+    encodings = face_recognition.face_encodings(frame, boxes)
     names = []
 
     # loop over the facial embeddings
@@ -49,5 +50,5 @@ while True:
         names.append(name)
         
     print(datetime.now()-a)
-    print(names)                                          
+    return names                                     
     #cap.close()   
