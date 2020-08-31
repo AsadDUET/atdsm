@@ -1,0 +1,81 @@
+import face_recognition
+#import cv2
+import pickle
+import time
+from datetime import datetime
+
+
+data = pickle.loads(open('database.pickle', "rb").read())
+#face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+#cap = cv2.VideoCapture(0)
+#time.sleep(3)
+def detect(frame,faces):
+    a=datetime.now()
+    #ret, frame = cap.read()
+    #frame = cv2.resize(frame, None, fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA)
+    #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    #faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+    #rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    #boxes = face_recognition.face_locations(rgb,model='hog')
+    # compute the facial embedding for the face
+    boxes = [(y, x + w, y + h, x) for (x, y, w, h) in faces]
+
+    encodings = face_recognition.face_encodings(frame, boxes)
+    names = []
+
+    # loop over the facial embeddings
+    for encoding in encodings:
+        # attempt to match each face in the input image to our known
+        # encodings
+        matches = face_recognition.compare_faces(data["encodings"],
+            encoding)
+        name = "Unknown"
+        # check to see if we have found a match
+        if True in matches:
+            # find the indexes of all matched faces then initialize a
+            # dictionary to count the total number of times each face
+            # was matched
+            matchedIdxs = [i for (i, b) in enumerate(matches) if b]
+            counts = {}
+            # loop over the matched indexes and maintain a count for
+            # each recognized face face
+            for i in matchedIdxs:
+                name = data["names"][i]
+                counts[name] = counts.get(name, 0) + 1
+            # determine the recognized face with the largest number
+            # of votes (note: in the event of an unlikely tie Python
+            # will select first entry in the dictionary)
+            name = max(counts, key=counts.get)
+        
+        # update the list of names
+        names.append(name)
+        
+    print(datetime.now()-a)
+    return names
+    #cap.close()   
+def compare(encoding,frame,faces):
+    big_face_box=0
+    for i,face in enumerate(faces):
+        try:
+            if face[2]>faces[i+1][2]:
+                big_face_box=i
+        except:
+            pass
+    boxes = [(y, x + w, y + h, x) for (x, y, w, h) in faces]
+    # compute the facial embedding for the face
+    encodings = face_recognition.face_encodings(frame, boxes)
+    
+    return face_recognition.face_distance([encoding],encodings[big_face_box])
+if __name__=='__main__':
+    import cv2
+    face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+    knownEncodings = []
+    knownIDs = []
+    knownPosts = []
+    knownNames=[]
+    cap = cv2.VideoCapture(0)
+    ret, frame = cap.read()
+    frame = cv2.resize(frame, None, fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA)
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+    print(compare(data[0]['encoding'],frame,faces))

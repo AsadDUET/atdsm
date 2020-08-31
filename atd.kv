@@ -1,0 +1,102 @@
+
+<AddEmployee>:
+    cols: 1
+    padding: (10,10)
+    Image:
+        id : facePreview
+        source: 'logo.jpeg'
+    GridLayout:
+        cols: 2
+        Label:
+            text: 'Name'
+        TextInput:
+            id: name
+            text: ''
+            
+        Label:
+            text: 'Post'
+        TextInput:
+            id: post
+            text: ''
+        Label:
+            text: 'ID'
+        TextInput:
+            id: ID
+            text: '2'
+    GridLayout:
+        cols:2
+        size_hint_y: 0.4
+        Button:
+            id: btn_home
+            text: 'close'
+            on_press: root.ch_p_home()
+        Button:
+            id: btn_add
+            text: 'Add'
+            on_press:root.add()
+<HomePage>:
+    cols: 1
+    padding: (10,10)
+    GridLayout:
+        cols: 3
+        size_hint_y: 0.2
+        Button:
+            text: 'Close'
+            text_size: (self.width, None)
+            halign: 'center'
+            on_press: root.close_app()
+            padding:(3,3)
+        Button:
+            text: 'Email'
+            text_size: (self.width, None)
+            halign: 'center'
+        Button:
+            text: 'Add Employee'
+            text_size: (self.width, None)
+            halign: 'center'
+            on_release: root.ch_p_add()
+    GridLayout:
+        cols: 1
+        size_hint_y: 0.1
+    GridLayout:
+        cols: 3
+        #padding: (10,10)
+        Image:
+            id: FaceCam
+            source: ''
+            allow_stretch: True
+        Label:
+            text: ''
+            size_hint_x: .01
+        Image:
+            id: QrCam
+            source: ''
+            allow_stretch: True
+        
+    GridLayout:
+        cols: 2
+        GridLayout:
+            cols: 2
+            Label:
+                text_size: (self.width, None)
+                halign: 'left'
+                text: 'Name: '
+            
+            Label:
+                id: name
+                text: 'Hello'
+                text_size: (self.width, None)
+                halign: 'left'
+            Label:
+                text_size: (self.width, None)
+                halign: 'left'
+                text: 'Post: '
+            Label:
+                id: post
+                text: 'Hello'
+                text_size: (self.width, None)
+                halign: 'left'
+        GridLayout:
+            cols: 2
+    
+        

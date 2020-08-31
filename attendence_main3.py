@@ -88,7 +88,7 @@ def loop():
     app.update()
     print(datetime.now()-a)
     rawCapture.truncate(0)
-    app.after(0,loop)
+    app.after(1,loop)
         
 app = App(layout="grid",title = "Attendence")
 btn_reset = PushButton(app, command =reset_c, text = "Close",grid=[0,0])
