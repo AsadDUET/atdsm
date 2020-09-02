@@ -1,4 +1,5 @@
 from kivy.app import App
+from kivymd.app import MDApp
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.clock import Clock
@@ -20,9 +21,12 @@ from picamera import PiCamera
 import pickle
 import encode_faces
 import csv
+import sendMail
 Window.fullscreen=True
 face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 cap = cv2.VideoCapture(1)
+cap.set(3,400)
+cap.set(4,400)
 camera = PiCamera()
 camera.resolution = (400, 400)
 camera.framerate = 32
@@ -35,7 +39,16 @@ with open('employee_data.txt', 'r') as f:
 data = pickle.loads(open('database.pickle', "rb").read())
 qr=None
 home_loop=None
-add_loop=None  
+add_loop=None
+class Email(GridLayout):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+    def s_email(self):
+        sendMail.send('mycontacts.txt','message.txt',"message.txt","20200830")
+    def ch_p_home(self):
+        global home_loop, cap
+        my_app.screen_manager.current='Home'
+        home_loop=Clock.schedule_interval(my_app.home_page.loop,0)
 class AddEmployee(GridLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -71,6 +84,8 @@ class HomePage(GridLayout):
         self.ids['QrCam'].source='logo.jpeg'
         self.start_home_loop()
     def close_app(self):
+        global cap
+        cap.release()
         my_app.get_running_app().stop()
     
     def loop(self,dt):
@@ -105,6 +120,7 @@ class HomePage(GridLayout):
                     try:
                         qr='0' #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<error
                         match = face.compare(data[qr]['encoding'],frame,faces)
+                        print(match)
                         if match<0.5:
                             identified=True
                             self.ids['name'].text  = data[qr]['name']
@@ -126,16 +142,24 @@ class HomePage(GridLayout):
                 cap.release()
                 identified=False
                 cap = cv2.VideoCapture(1)
+                cap.set(3,400)
+                cap.set(4,400)
                 qr=None
                 print('[Attendence] Done')
         print(datetime.now()-a)
+    
     def ch_p_add(self):
         global cap, add_loop
         self.stop_home_loop()
         my_app.screen_manager.current='Add Employee'
         cap.release()
         cap = cv2.VideoCapture(1)
+        cap.set(3,400)
+        cap.set(4,400)
         add_loop=Clock.schedule_interval(my_app.AddEmployee_page.add_employee_loop,0)
+    def ch_p_email(self):
+        self.stop_home_loop()
+        my_app.screen_manager.current='email'
 
     def start_home_loop(self):
         global data, home_loop
@@ -145,7 +169,7 @@ class HomePage(GridLayout):
         global home_loop
         Clock.unschedule(home_loop)
      
-class AtdApp(App):
+class AtdApp(MDApp):
     def build(self):
         
         self.screen_manager = ScreenManager()
@@ -158,6 +182,11 @@ class AtdApp(App):
         self.AddEmployee_page = AddEmployee()
         screen = Screen(name='Add Employee')
         screen.add_widget(self.AddEmployee_page)
+        self.screen_manager.add_widget(screen)
+        
+        self.email_page = Email()
+        screen = Screen(name='email')
+        screen.add_widget(self.email_page)
         self.screen_manager.add_widget(screen)
 
         return self.screen_manager

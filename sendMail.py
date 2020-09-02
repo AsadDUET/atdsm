@@ -14,7 +14,7 @@ from email.mime.base import MIMEBase
 from email import encoders
 
 
-with open('..\mail_pass.txt', mode='r', encoding='utf-8') as file:
+with open('../mail_pass.txt', mode='r', encoding='utf-8') as file:
         text=file.readline()
         PASSWORD = text.split()[1]
         MY_ADDRESS = text.split()[0]
@@ -44,9 +44,9 @@ def read_template(filename):
         template_file_content = template_file.read()
     return Template(template_file_content)
 
-def send():
-    names, emails =get_contacts('mycontacts.txt') # read contacts
-    message_template = read_template('message.txt')
+def send(contacts,template, filename,date):
+    names, emails =get_contacts(contacts) # read contacts
+    message_template = read_template(template)
 
     # set up the SMTP server
     s = smtplib.SMTP(host='smtp.gmail.com', port=587 )
@@ -58,9 +58,9 @@ def send():
         msg = MIMEMultipart()       # create a message
 
         # add in the actual person name to the message template
-        message = message_template.substitute(PERSON_NAME=name.title())
+        message = message_template.substitute(PERSON_NAME=name.title(),DATE=date[-2:]+'/'+date[4:6]+'/'+date[0:4])
         
-        filename = "message.txt"
+        
         attachment = open(filename, "rb") 
           
         # instance of MIMEBase and named as p 
@@ -83,7 +83,7 @@ def send():
         # setup the parameters of the message
         msg['From']=MY_ADDRESS
         msg['To']=email
-        msg['Subject']="This is TEST"
+        msg['Subject']="Attendance Info"
         
         # add in the message body
         msg.attach(MIMEText(message, 'plain'))
@@ -97,4 +97,4 @@ def send():
     s.quit()
     
 if __name__ == '__main__':
-    send()
+    send('mycontacts.txt','message.txt',"message.txt","20200830")

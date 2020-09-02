@@ -1,6 +1,5 @@
 Dear ${PERSON_NAME}, 
 
-This is a test message. 
-Have a great weekend! 
+Here is the attendence info for ${DATE}
 
-Yours Truly
+Sciencierly Yours 

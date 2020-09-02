@@ -1,102 +1,142 @@
 
-<AddEmployee>:
+<Email>:
     cols: 1
     padding: (10,10)
-    Image:
-        id : facePreview
-        source: 'logo.jpeg'
     GridLayout:
         cols: 2
         Label:
-            text: 'Name'
-        TextInput:
-            id: name
-            text: ''
+            text: 'Choose Data:'
+            text_size: (self.width, None)
+            halign: 'center'
+        GridLayout:
+            cols: 1
+            CheckBox:
+                id: daily
+            CheckBox:
+                id: monthly
+    Button:
+        text: 'Send E-mail'
+        on_press: root.s_email()
+    Button:
+        text: 'Back'
+        on_press: root.ch_p_home()
             
-        Label:
-            text: 'Post'
-        TextInput:
+<AddEmployee>:
+    cols: 1
+    padding: (10,10)
+    spacing: dp(10)
+    Image:
+        id : facePreview
+        source: 'logo.jpeg'
+        allow_stretch: True
+    MDSeparator:
+    GridLayout:
+        cols: 1
+        padding: (100,10)
+        MDTextField:
+            id: name
+            required: True
+            hint_text: 'Name'
+            helper_text_mode: 'persistent'
+        MDTextField:
             id: post
-            text: ''
-        Label:
-            text: 'ID'
-        TextInput:
+            required: True
+            hint_text: 'Post'
+            helper_text_mode: 'persistent'
+        MDTextField:
             id: ID
-            text: '2'
+            required: True
+            hint_text: 'ID'
+            helper_text_mode: 'persistent'
+    MDSeparator:
     GridLayout:
         cols:2
-        size_hint_y: 0.4
-        Button:
+        spacing: dp(20)
+        size_hint_y: 0.2
+        MDRaisedButton:
             id: btn_home
             text: 'close'
+            size_hint_x:1
             on_press: root.ch_p_home()
-        Button:
+        MDRaisedButton:
             id: btn_add
             text: 'Add'
+            size_hint_x:1
             on_press:root.add()
 <HomePage>:
     cols: 1
-    padding: (10,10)
-    GridLayout:
+    spacing: dp(10)
+    MDToolbar:
+        id: toolbar
+        title: 'Imami'
+        md_bg_color: app.theme_cls.primary_color
+        elevation: 10
+        left_action_items: [["dots-vertical", lambda x: None]]
+        pos_hint: {"top": 1}
+    MDGridLayout:
         cols: 3
+        spacing: dp(20)
         size_hint_y: 0.2
-        Button:
+        padding: dp(10)
+        MDRaisedButton:
             text: 'Close'
-            text_size: (self.width, None)
+            #text_size: (self.width, None)
             halign: 'center'
+            size_hint_x:1
             on_press: root.close_app()
-            padding:(3,3)
-        Button:
+        MDRaisedButton:
             text: 'Email'
-            text_size: (self.width, None)
+            #text_size: (self.width, None)
             halign: 'center'
-        Button:
+            size_hint_x:1
+            on_press: root.ch_p_email()
+        MDRaisedButton:
             text: 'Add Employee'
-            text_size: (self.width, None)
+            #text_size: (self.width, None)
             halign: 'center'
+            size_hint_x:1
             on_release: root.ch_p_add()
-    GridLayout:
-        cols: 1
-        size_hint_y: 0.1
-    GridLayout:
+    MDSeparator:
+    MDGridLayout:
         cols: 3
-        #padding: (10,10)
+        padding: dp(10)
+        spacing: dp(20)
         Image:
             id: FaceCam
             source: ''
             allow_stretch: True
-        Label:
-            text: ''
-            size_hint_x: .01
         Image:
             id: QrCam
             source: ''
             allow_stretch: True
-        
-    GridLayout:
+    MDSeparator:
+    MDGridLayout:
         cols: 2
+        padding: dp(10)
         GridLayout:
             cols: 2
-            Label:
-                text_size: (self.width, None)
+            OneLineListItem:
                 halign: 'left'
                 text: 'Name: '
             
-            Label:
+            OneLineListItem:
                 id: name
                 text: 'Hello'
-                text_size: (self.width, None)
                 halign: 'left'
-            Label:
-                text_size: (self.width, None)
+            OneLineListItem:
                 halign: 'left'
                 text: 'Post: '
-            Label:
+            OneLineListItem:
                 id: post
                 text: 'Hello'
-                text_size: (self.width, None)
                 halign: 'left'
-        GridLayout:
-            cols: 2
+    MDBottomAppBar:
+
+        MDToolbar:
+            id: toolbar
+            title: "Title"
+            icon: "git"
+            type: "bottom"
+            left_action_items: [["menu", lambda x: x]]
     
         
