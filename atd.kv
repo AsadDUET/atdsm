@@ -1,26 +1,38 @@
-
+#:import MDDropdownMenu kivymd.uix.menu.MDDropdownMenu
 <Email>:
     cols: 1
     padding: (10,10)
     GridLayout:
         cols: 2
-        Label:
+        MDLabel:
             text: 'Choose Data:'
-            text_size: (self.width, None)
             halign: 'center'
-        GridLayout:
-            cols: 1
+            font_style: 'H6'
+        MDGridLayout:
+            cols: 2
             CheckBox:
                 id: daily
+            MDLabel:
+                text: 'Daily'
             CheckBox:
                 id: monthly
-    Button:
-        text: 'Send E-mail'
-        on_press: root.s_email()
-    Button:
-        text: 'Back'
-        on_press: root.ch_p_home()
-            
+            MDLabel:
+                text: 'Monthly'
+    MDGridLayout:
+        cols: 2
+        padding: (10,10)
+        spacing: dp(10)
+        size_hint: 1,0.2
+        MDRaisedButton:
+            text: 'Back'
+            size_hint: 1, 1
+            on_press: root.ch_p_home()
+        MDRaisedButton:
+            text: 'Send E-mail'
+            size_hint: 1, 1
+            on_press: root.s_email()
+
+
 <AddEmployee>:
     cols: 1
     padding: (10,10)
@@ -49,57 +61,60 @@
             hint_text: 'ID'
             helper_text_mode: 'persistent'
     MDSeparator:
-    GridLayout:
-        cols:2
-        spacing: dp(20)
+    BoxLayout:
+        # cols:2
+        spacing: dp(10)
         size_hint_y: 0.2
+        padding: dp(5)
         MDRaisedButton:
             id: btn_home
             text: 'close'
-            size_hint_x:1
+            halign: 'center'
+            size_hint: 1, 1
             on_press: root.ch_p_home()
         MDRaisedButton:
             id: btn_add
             text: 'Add'
-            size_hint_x:1
+            halign: 'center'
+            size_hint: 1, 1
             on_press:root.add()
 <HomePage>:
     cols: 1
     spacing: dp(10)
     MDToolbar:
         id: toolbar
-        title: 'Imami'
-        md_bg_color: app.theme_cls.primary_color
+        title: ''
+        # md_bg_color: app.theme_cls.primary_color
         elevation: 10
         left_action_items: [["dots-vertical", lambda x: None]]
         pos_hint: {"top": 1}
     MDGridLayout:
         cols: 3
-        spacing: dp(20)
-        size_hint_y: 0.2
-        padding: dp(10)
+        spacing: dp(10)
+        size_hint_y: 0.3
+        padding: dp(5)
         MDRaisedButton:
             text: 'Close'
             #text_size: (self.width, None)
             halign: 'center'
-            size_hint_x:1
+            size_hint: 1, 1
             on_press: root.close_app()
         MDRaisedButton:
             text: 'Email'
             #text_size: (self.width, None)
             halign: 'center'
-            size_hint_x:1
+            size_hint: 1, 1
             on_press: root.ch_p_email()
         MDRaisedButton:
             text: 'Add Employee'
             #text_size: (self.width, None)
             halign: 'center'
-            size_hint_x:1
+            size_hint: 1, 1
             on_release: root.ch_p_add()
     MDSeparator:
     MDGridLayout:
         cols: 3
-        padding: dp(10)
+        padding: dp(5)
         spacing: dp(20)
         Image:
             id: FaceCam
@@ -113,12 +128,13 @@
     MDGridLayout:
         cols: 2
         padding: dp(10)
+        size_hint_y: 0.5
         GridLayout:
             cols: 2
             OneLineListItem:
                 halign: 'left'
                 text: 'Name: '
-            
+
             OneLineListItem:
                 id: name
                 text: 'Hello'
@@ -131,12 +147,12 @@
                 text: 'Hello'
                 halign: 'left'
     MDBottomAppBar:
-
         MDToolbar:
             id: toolbar
-            title: "Title"
-            icon: "git"
+            title: ""
+            #icon: "add"
             type: "bottom"
-            left_action_items: [["menu", lambda x: x]]
-    
-        
+            on_action_button: root.myMenu()
+            #MDDropdownMenu(items=root.menu_items,caller=self, width_mult=4).open()
+            #root.menu.open()
+            #left_action_items: [["menu", lambda x: x]]

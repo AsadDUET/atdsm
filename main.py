@@ -1,5 +1,6 @@
 from kivy.app import App
 from kivymd.app import MDApp
+from kivymd.uix.menu import MDDropdownMenu
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.clock import Clock
@@ -22,9 +23,10 @@ import pickle
 import encode_faces
 import csv
 import sendMail
-Window.fullscreen=True
+Window.size = (800, 480)
+#Window.fullscreen=True
 face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 cap.set(3,400)
 cap.set(4,400)
 camera = PiCamera()
@@ -52,11 +54,11 @@ class Email(GridLayout):
 class AddEmployee(GridLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-    def ch_p_home(self):
-        global home_loop, cap,add_loop
+
+        def ch_p_home(self):
+            global home_loop, cap,add_loop
         Clock.unschedule(add_loop)
         my_app.screen_manager.current='Home'
-        
         home_loop=Clock.schedule_interval(my_app.home_page.loop,0)
         #cap.release()
         #cap = cv2.VideoCapture(1)
@@ -74,20 +76,36 @@ class AddEmployee(GridLayout):
         global data,cap
         ret, frame = cap.read()
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        faces = face_cascade.detectMultiScale(gray, 1.3, 5)        
+        faces = face_cascade.detectMultiScale(gray, 1.3, 5)
         encode_faces.add_employee(frame,faces,self.ids['ID'].text,self.ids['name'].text,self.ids['post'].text)
         data = pickle.loads(open('database.pickle', "rb").read())
 class HomePage(GridLayout):
     def __init__(self, **kwargs):
+        global home_loop
         super().__init__(**kwargs)
-        self.ids['FaceCam'].source='3.jpeg'
+        self.ids['FaceCam'].source='logo.jpeg'
         self.ids['QrCam'].source='logo.jpeg'
-        self.start_home_loop()
+
+        self.menu_items = [{'viewclass': 'MDMenuItem',
+                        'text': 'clickable item',}]
+        self.menu = MDDropdownMenu(
+            items=self.menu_items,
+            caller=self.ids.toolbar,
+            width_mult=4)
+        self.menu.bind(on_press=self.menu_callback)
+        home_loop=Clock.schedule_interval(self.loop,0)
+    def myMenu(self):
+        global home_loop
+        # Clock.unschedule(home_loop)
+        self.menu.open()
+    def menu_callback(self,*args):
+        print(args[0])
+
     def close_app(self):
         global cap
         cap.release()
         my_app.get_running_app().stop()
-    
+
     def loop(self,dt):
         global cap, qr,data
         a = datetime.now()
@@ -128,8 +146,7 @@ class HomePage(GridLayout):
                             with open(datetime.now().strftime('%Y%m%d')+'.csv', mode='a') as employee_file:
                                 employee_writer = csv.writer(employee_file,lineterminator = '\n')
                                 employee_writer.writerow([qr, datetime.now().strftime('%H:%M:%S'),match[0]])
-                        
-                            
+
                     except:
                         raise
             frame = cv2.flip(frame,-1)
@@ -141,26 +158,26 @@ class HomePage(GridLayout):
                 self.ids['FaceCam'].texture =CoreImage('logo.jpeg').texture
                 cap.release()
                 identified=False
-                cap = cv2.VideoCapture(1)
+                cap = cv2.VideoCapture(0)
                 cap.set(3,400)
                 cap.set(4,400)
                 qr=None
                 print('[Attendence] Done')
         print(datetime.now()-a)
-    
+
     def ch_p_add(self):
         global cap, add_loop
         self.stop_home_loop()
         my_app.screen_manager.current='Add Employee'
         cap.release()
-        cap = cv2.VideoCapture(1)
+        cap = cv2.VideoCapture(0)
         cap.set(3,400)
         cap.set(4,400)
         add_loop=Clock.schedule_interval(my_app.AddEmployee_page.add_employee_loop,0)
     def ch_p_email(self):
+        global cap
         self.stop_home_loop()
         my_app.screen_manager.current='email'
-
     def start_home_loop(self):
         global data, home_loop
         data=pickle.loads(open('database.pickle', "rb").read())
@@ -168,31 +185,33 @@ class HomePage(GridLayout):
     def stop_home_loop(self):
         global home_loop
         Clock.unschedule(home_loop)
-     
+
 class AtdApp(MDApp):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
     def build(self):
-        
+
         self.screen_manager = ScreenManager()
-        
+
         self.home_page = HomePage()
         screen = Screen(name='Home')
         screen.add_widget(self.home_page)
         self.screen_manager.add_widget(screen)
-        
+
         self.AddEmployee_page = AddEmployee()
         screen = Screen(name='Add Employee')
         screen.add_widget(self.AddEmployee_page)
         self.screen_manager.add_widget(screen)
-        
+
         self.email_page = Email()
         screen = Screen(name='email')
         screen.add_widget(self.email_page)
         self.screen_manager.add_widget(screen)
 
         return self.screen_manager
-    
-    
+
 if __name__ == "__main__":
     my_app = AtdApp()
-    
+
     my_app.run()
