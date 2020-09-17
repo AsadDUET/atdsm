@@ -1,158 +1,198 @@
 #:import MDDropdownMenu kivymd.uix.menu.MDDropdownMenu
 <Email>:
-    cols: 1
-    padding: (10,10)
-    GridLayout:
-        cols: 2
+    MDGridLayout
+        cols: 1
+        padding: (10,10)
         MDLabel:
             text: 'Choose Data:'
             halign: 'center'
             font_style: 'H6'
         MDGridLayout:
-            cols: 2
-            CheckBox:
+            cols: 4
+            MDCheckbox:
                 id: daily
             MDLabel:
                 text: 'Daily'
-            CheckBox:
+                halign:'left'
+            MDCheckbox:
                 id: monthly
             MDLabel:
                 text: 'Monthly'
-    MDGridLayout:
-        cols: 2
-        padding: (10,10)
-        spacing: dp(10)
-        size_hint: 1,0.2
-        MDRaisedButton:
-            text: 'Back'
-            size_hint: 1, 1
-            on_press: root.ch_p_home()
-        MDRaisedButton:
-            text: 'Send E-mail'
-            size_hint: 1, 1
-            on_press: root.s_email()
+                halign:'left'
+        MDGridLayout:
+            cols: 2
+            padding: (10,10)
+            spacing: dp(10)
+            size_hint: 1,0.5
+            MDRaisedButton:
+                text: 'Back'
+                size_hint: 1, 1
+                on_press: root.ch_p_home()
+            MDRaisedButton:
+                text: 'Send E-mail'
+                size_hint: 1, 1
+                on_press: root.s_email()
 
 
 <AddEmployee>:
-    cols: 1
-    padding: (10,10)
-    spacing: dp(10)
-    Image:
-        id : facePreview
-        source: 'logo.jpeg'
-        allow_stretch: True
-    MDSeparator:
-    GridLayout:
+    MDGridLayout:
         cols: 1
-        padding: (100,10)
-        MDTextField:
-            id: name
-            required: True
-            hint_text: 'Name'
-            helper_text_mode: 'persistent'
-        MDTextField:
-            id: post
-            required: True
-            hint_text: 'Post'
-            helper_text_mode: 'persistent'
-        MDTextField:
-            id: ID
-            required: True
-            hint_text: 'ID'
-            helper_text_mode: 'persistent'
-    MDSeparator:
-    BoxLayout:
-        # cols:2
+        padding: (10,10)
         spacing: dp(10)
-        size_hint_y: 0.2
-        padding: dp(5)
-        MDRaisedButton:
-            id: btn_home
-            text: 'close'
-            halign: 'center'
-            size_hint: 1, 1
-            on_press: root.ch_p_home()
-        MDRaisedButton:
-            id: btn_add
-            text: 'Add'
-            halign: 'center'
-            size_hint: 1, 1
-            on_press:root.add()
-<HomePage>:
-    cols: 1
-    spacing: dp(10)
-    MDToolbar:
-        id: toolbar
-        title: ''
-        # md_bg_color: app.theme_cls.primary_color
-        elevation: 10
-        left_action_items: [["dots-vertical", lambda x: None]]
-        pos_hint: {"top": 1}
-    MDGridLayout:
-        cols: 3
-        spacing: dp(10)
-        size_hint_y: 0.3
-        padding: dp(5)
-        MDRaisedButton:
-            text: 'Close'
-            #text_size: (self.width, None)
-            halign: 'center'
-            size_hint: 1, 1
-            on_press: root.close_app()
-        MDRaisedButton:
-            text: 'Email'
-            #text_size: (self.width, None)
-            halign: 'center'
-            size_hint: 1, 1
-            on_press: root.ch_p_email()
-        MDRaisedButton:
-            text: 'Add Employee'
-            #text_size: (self.width, None)
-            halign: 'center'
-            size_hint: 1, 1
-            on_release: root.ch_p_add()
-    MDSeparator:
-    MDGridLayout:
-        cols: 3
-        padding: dp(5)
-        spacing: dp(20)
         Image:
-            id: FaceCam
-            source: ''
+            id : facePreview
+            source: 'logo.jpeg'
             allow_stretch: True
-        Image:
-            id: QrCam
-            source: ''
-            allow_stretch: True
-    MDSeparator:
-    MDGridLayout:
-        cols: 2
-        padding: dp(10)
-        size_hint_y: 0.5
-        GridLayout:
-            cols: 2
-            OneLineListItem:
-                halign: 'left'
-                text: 'Name: '
-
-            OneLineListItem:
+        MDLabel:
+            id: forhead_pos
+            text: ''
+        MDSeparator:
+        MDGridLayout:
+            cols: 1
+            padding: (100,10)
+            MDTextField:
                 id: name
-                text: 'Hello'
-                halign: 'left'
-            OneLineListItem:
-                halign: 'left'
-                text: 'Post: '
-            OneLineListItem:
+                required: True
+                hint_text: 'Name'
+                helper_text_mode: 'persistent'
+            MDTextField:
                 id: post
-                text: 'Hello'
-                halign: 'left'
-    MDBottomAppBar:
+                required: True
+                hint_text: 'Post'
+                helper_text_mode: 'persistent'
+            MDTextField:
+                id: ID
+                required: True
+                hint_text: 'ID'
+                helper_text_mode: 'persistent'
+        MDSeparator:
+        BoxLayout:
+            # cols:2
+            spacing: dp(10)
+            size_hint_y: 0.2
+            padding: dp(5)
+            MDRaisedButton:
+                id: btn_home
+                text: 'close'
+                halign: 'center'
+                size_hint: 1, 1
+                on_press: root.ch_p_home()
+            MDRaisedButton:
+                id: btn_add
+                text: 'Add'
+                halign: 'center'
+                size_hint: 1, 1
+                on_press:root.add()
+<HomePage>:
+    MDGridLayout:
+        cols: 1
+        spacing: dp(10)
         MDToolbar:
             id: toolbar
-            title: ""
-            #icon: "add"
-            type: "bottom"
-            on_action_button: root.myMenu()
-            #MDDropdownMenu(items=root.menu_items,caller=self, width_mult=4).open()
-            #root.menu.open()
-            #left_action_items: [["menu", lambda x: x]]
+            title: ''
+            height: dp(30)
+            # md_bg_color: app.theme_cls.primary_color
+            elevation: 10
+            left_action_items: [["dots-vertical", lambda x: None]]
+            pos_hint: {"top": 1}
+        MDGridLayout:
+            cols: 3
+            spacing: dp(5)
+            size_hint_y: 0.2
+            padding: dp(5)
+            MDRaisedButton:
+                text: 'Close'
+                #text_size: (self.width, None)
+                halign: 'center'
+                size_hint: 1, 1
+                on_press: root.close_app()
+            MDRaisedButton:
+                text: 'Email'
+                #text_size: (self.width, None)
+                halign: 'center'
+                size_hint: 1, 1
+                on_press: root.ch_p_email()
+            MDRaisedButton:
+                text: 'Add Employee'
+                #text_size: (self.width, None)
+                halign: 'center'
+                size_hint: 1, 1
+                on_release: root.ch_p_add()#Buttons
+        MDSeparator:
+        MDGridLayout:
+            cols: 2
+            padding: (dp(20),dp(0))
+            spacing: dp(20)
+            MDCard:
+                orientation: "vertical"
+                padding: "8dp"
+                elevation: 0.1
+                size_hint_: None, 1
+                pos_hint: {"center_x": .5, "center_y": .5}
+
+                MDLabel:
+                    text: "Camera"
+                    theme_text_color: "Secondary"
+                    size_hint_y: None
+                    height: self.texture_size[1]
+
+                MDSeparator:
+                    height: "1dp"
+
+                Image:
+                    id: FaceCam
+                    source: ''
+                    allow_stretch: True
+            # MDCard:
+            #     orientation: "vertical"
+            #     padding: "8dp"
+            #     size_hint: 1, 1
+            #     pos_hint: {"center_x": .5, "center_y": .5}
+            #
+            #     MDLabel:
+            #         text: "ID Check"
+            #         theme_text_color: "Secondary"
+            #         size_hint_y: None
+            #         height: self.texture_size[1]
+            #
+            #     MDSeparator:
+            #         height: "1dp"
+            #     Image:
+            #         id: QrCam
+            #         source: ''
+            #         allow_stretch: True#Camera
+        # MDSeparator:
+            MDGridLayout:
+                cols: 2
+                padding: dp(10)
+                size_hint_y: 0.3
+                OneLineListItem:
+                    halign: 'left'
+                    text: 'Name: '
+
+                OneLineListItem:
+                    id: name
+                    text: 'Hello'
+                    halign: 'left'
+                OneLineListItem:
+                    halign: 'left'
+                    text: 'Post: '
+                OneLineListItem:
+                    id: post
+                    text: 'Hello'
+                    halign: 'left'#Info
+        # MDLabel:
+        #     size_hint_y: 0.1
+        #     text: ''
+        #     halign: 'left'
+        MDBottomAppBar:
+            size_hint: 1,0.3
+            MDToolbar:
+                id: toolbar
+                title: ""
+                #icon: "add"
+                type: "bottom"
+                #MDDropdownMenu(items=root.menu_items,caller=self, width_mult=4).open()
+                #root.menu.open()
+                #left_action_items: [["menu", lambda x: x]]
+<AtdCompletePage>:
