@@ -12,6 +12,13 @@ from kivy.core.window import Window
 from kivy.graphics.texture import Texture
 from kivy.core.audio import SoundLoader
 from kivy.uix.popup import Popup
+from kivymd.uix.dialog import MDDialog
+
+import busio
+import board
+import adafruit_amg88xx
+import numpy as np
+
 import io
 import serial
 from time import sleep
@@ -29,6 +36,9 @@ import csv
 import sendMail
 from pygame import mixer
 mixer.init()
+
+i2c = busio.I2C(board.SCL, board.SDA)
+amg = adafruit_amg88xx.AMG88XX(i2c)
 
 Window.size = (800, 480)
 Window.fullscreen=True
@@ -52,10 +62,11 @@ cap = cv2.VideoCapture(cam_no)
 cap.set(3,400)
 cap.set(4,400)
 camera = PiCamera()
-camera.resolution = (400, 400)
+camera.resolution = (640, 480)
 camera.rotation = 180
 camera.framerate = 32
-rawCapture = PiRGBArray(camera, size=(400, 400))
+rawCapture = PiRGBArray(camera, size=(640, 480))
+rawCapture.truncate()
 # sound_complete = SoundLoader.load('sound/check_in_complete.wav')
 # sound_complete.seek(0)
 # print(sound_complete)
@@ -73,7 +84,20 @@ class Email(MDScreen):
         super().__init__(**kwargs)
         self.name='email'
     def s_email(self):
-        sendMail.send('mycontacts.txt','message.txt',"message.txt","20200830")
+        self.dialog = MDDialog(
+                text="Sending E-Mail",
+                buttons=[
+                    MDFlatButton(
+                        text="CANCEL", text_color=self.theme_cls.primary_color
+                    ),
+                    MDFlatButton(
+                        text="DISCARD", text_color=self.theme_cls.primary_color
+                    ),
+                ],
+            )
+        self.dialog.open()
+        sendMail.send('mycontacts.txt','message.txt',datetime.now().strftime('%Y%m%d')+'.csv',datetime.now().strftime('%Y%m%d'))
+        self.dialog.close()
     def ch_p_home(self):
         global home_loop, cap
         my_app.screen_manager.current='Home'
@@ -169,6 +193,24 @@ class HomePage(MDScreen):
             image_texture= Texture.create(size=(pi_image.shape[1],pi_image.shape[0]),colorfmt='rgb')
             image_texture.blit_buffer(buf,colorfmt='rgb',bufferfmt='ubyte')
             self.ids['FaceCam'].texture =image_texture
+
+            # ret, frame = cap.read()
+            # # frame = cv2.resize(frame, None, fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA)
+            # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            # faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+            # if len(faces)==0:
+            ser.write(str('0').encode('utf-8'))
+            # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            # frame_width = frame.shape[1]
+            # if len(faces)==0:
+            #     print('forhead: 0')
+            # for (x,y,w,h) in faces:
+            #     forehead = (int(x+w/2),int(y+h*.15))
+            #     frame = cv2.rectangle(frame,forehead,(forehead[0]+1,forehead[1]+1),(255,0,0),2)
+            #     print('forhead: {}'.format(forehead[1]))
+            #     #frame = cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,0),2)
+            #     frame = cv2.rectangle(frame,((int(frame_width/2)-10),0),(int(frame_width/2+10),frame_width),(255,0,0),2)
+            #     ser.write(str(int(frame.shape[0]/2-forehead[1])).encode('utf-8'))
             # rawCapture.truncate(0)
         if qr is not None:
             identified=False
@@ -176,6 +218,8 @@ class HomePage(MDScreen):
             # frame = cv2.resize(frame, None, fx=0.5, fy=0.5, interpolation=cv2.INTER_AREA)
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+            if len(faces)==0:
+                ser.write(str('0').encode('utf-8'))
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             frame_width = frame.shape[1]
             if len(faces)==0:
@@ -186,18 +230,25 @@ class HomePage(MDScreen):
                 print('forhead: {}'.format(forehead[1]))
                 #frame = cv2.rectangle(frame,(x,y),(x+w,y+h),(255,0,0),2)
                 frame = cv2.rectangle(frame,((int(frame_width/2)-10),0),(int(frame_width/2+10),frame_width),(255,0,0),2)
-                if abs(forehead[0]-frame_width/2)<20:
+                ser.write(str(int(frame.shape[0]/2-forehead[1])).encode('utf-8'))
+                if abs(forehead[0]-frame_width/2)<20 and abs(frame.shape[0]/2-forehead[1])<5:
                     try:
                         qr='0' #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<error
                         match = face.compare(data[qr]['encoding'],frame,faces)
                         print(match)
-                        if match<0.5:
+                        if match<0.6:
                             identified=True
+                            temps=np.array(amg.pixels)
+                            temp=temps.max()#[2:6,2:6].max()
                             self.ids['name'].text  = data[qr]['name']
                             self.ids['post'].text  = data[qr]['post']
+                            self.ids['temp'].text  = str(temp)+' C'
                             with open(datetime.now().strftime('%Y%m%d')+'.csv', mode='a') as employee_file:
                                 employee_writer = csv.writer(employee_file,lineterminator = '\n')
                                 employee_writer.writerow([qr, datetime.now().strftime('%H:%M:%S'),match[0]])
+
+
+
                             # sound_complete.play()
 
 
